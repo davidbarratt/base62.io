@@ -65,7 +65,7 @@ const createEncoder = (opt) => {
         leadingZeroes += 1;
         data.shift();
       }
-      let converted = convert(data, 256, 62);
+      let converted = convert(data, 65536, 62);
       if (leadingZeroes > 0) {
         converted = [
           ...Array(leadingZeroes).fill(0, 0, leadingZeroes),
@@ -79,7 +79,7 @@ const createEncoder = (opt) => {
     encodeInt: (value) => {
       const data = [value];
 
-      return convert(data, 256, 62).map(index => options.characters[index]).join('');
+      return convert(data, 65536, 62).map(index => options.characters[index]).join('');
     },
     // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62/BaseEncoder.php#L83
     decode: (value) => {
@@ -90,7 +90,7 @@ const createEncoder = (opt) => {
         leadingZeroes += 1;
         data.shift();
       }
-      let converted = convert(data, 62, 256);
+      let converted = convert(data, 62, 65536);
       if (leadingZeroes > 0) {
         converted = [
           ...Array(leadingZeroes).fill(0, 0, leadingZeroes),
