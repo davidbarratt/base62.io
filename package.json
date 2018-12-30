@@ -1,0 +1,30 @@
+{
+  "name": "base62.io",
+  "version": "1.0.0",
+  "description": "JavaScript port of base62.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint . && jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidbarratt/base62.io.git"
+  },
+  "keywords": [
+    "base62"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidbarratt/base62.io/issues"
+  },
+  "homepage": "https://github.com/davidbarratt/base62.io#readme",
+  "devDependencies": {
+    "eslint": "^5.11.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.12.0",
+    "jest": "^23.6.0"
+  }
+}
