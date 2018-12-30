@@ -22,7 +22,7 @@ describe.each([[GMP], [INVERTED], ['1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH
   test('encode and decode integers', () => {
     const data = 987654321;
     const encoder = createEncoder({ characters });
-    const decoded = encoder.decode(encoder.encode(data));
+    const decoded = encoder.decodeInt(encoder.encodeInt(data));
 
     return expect(decoded).toEqual(data);
   });
@@ -40,7 +40,7 @@ describe.each([[GMP], [INVERTED], ['1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH
   test('encode and decode big integers', () => {
     const data = Number.MAX_SAFE_INTEGER;
     const encoder = createEncoder({ characters });
-    const decoded = encoder.decode(encoder.encode(data));
+    const decoded = encoder.decodeInt(encoder.encodeInt(data));
 
     return expect(decoded).toEqual(data);
   });
@@ -56,7 +56,7 @@ describe.each([[GMP], [INVERTED], ['1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH
 
   // @see https://github.com/tuupola/base62/blob/2.0.0/tests/Base62Test.php#L456
   test('encode and decode multiple zero bytes', () => {
-    const data = '\x00\x00\x00';
+    const data = Buffer.from('\x00\x00\x00', 'binary').toString();
     const encoder = createEncoder({ characters });
     const decoded = encoder.decode(encoder.encode(data));
 
@@ -86,6 +86,11 @@ describe.each([[GMP], [INVERTED], ['1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH
 test.each([['Hello world!', 'T8dgcjRGuYUueWht'], [Buffer.from('0000010203040506', 'hex').toString('binary'), '1HqQxjs']])('use default character set', (data, expected) => {
   const encoded = encode(data);
   const decoded = decode(encoded);
+
+  console.log('DATA', data);
+  console.log('ENCODED', encoded);
+  console.log('DECODED', decoded);
+  console.log('EXPECTED', expected);
 
   expect(encoded).toEqual(expected);
   expect(decoded).toEqual(data);
