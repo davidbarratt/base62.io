@@ -91,9 +91,19 @@ test.each([['Hello world!', 'BfClwpqbAZpeaVbeGIwSh3Djrgbvwbx'], [Buffer.from('00
   expect(decoded).toEqual(data);
 });
 
+// @see https://github.com/tuupola/base62/blob/2.0.0/tests/Base62Test.php#L164
+test.each([['Hello world!', 'latin1', 'T8dgcjRGuYUueWht'], [Buffer.from('0000010203040506', 'hex').toString('binary'), 'utf16', '0062iwmW2r44i2kw']])('use default character set with encoding', (data, encoding, expected) => {
+  const encoder = createEncoder({ encoding });
+  const encoded = encoder.encode(data);
+  const decoded = encoder.decode(encoded);
+
+  expect(encoded).toEqual(expected);
+  expect(decoded).toEqual(data);
+});
+
 // @see https://github.com/tuupola/base62/blob/2.0.0/tests/Base62Test.php#L208
-test.each([['Hello world!', 'bFcLWPQBazPEAvBEgiWsH3dJRGBVWBX'], [Buffer.from('0000010203040506', 'hex').toString('binary'), '0062IWMw2R44I2KW']])('use inverted character set', (data, expected) => {
-  const encoder = createEncoder({ characters: INVERTED });
+test.each([['Hello world!', 'latin1', 't8DGCJrgUyuUEwHT'], [Buffer.from('0000010203040506', 'hex').toString('binary'), 'utf16', '0062IWMw2R44I2KW']])('use inverted character set', (data, encoding, expected) => {
+  const encoder = createEncoder({ characters: INVERTED, encoding });
   const encoded = encoder.encode(data);
   const decoded = encoder.decode(encoded);
 
@@ -102,8 +112,8 @@ test.each([['Hello world!', 'bFcLWPQBazPEAvBEgiWsH3dJRGBVWBX'], [Buffer.from('00
 });
 
 // @see https://github.com/tuupola/base62/blob/2.0.0/tests/Base62Test.php#L248
-test.each([['Hello world!', 'bFcLWPQBazPEAvBEgiWsH4dJRGBVWBX'], [Buffer.from('0000010203040506', 'hex').toString('binary'), '1173IWMw3R55I3KW']])('use custom character set', (data, expected) => {
-  const encoder = createEncoder({ characters: '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' });
+test.each([['Hello world!', 'latin1', 't9DGCJrgUyuUEwHT'], [Buffer.from('0000010203040506', 'hex').toString('binary'), 'utf16', '1173IWMw3R55I3KW']])('use custom character set', (data, encoding, expected) => {
+  const encoder = createEncoder({ characters: '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', encoding });
   const encoded = encoder.encode(data);
   const decoded = encoder.decode(encoded);
 

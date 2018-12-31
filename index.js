@@ -1,7 +1,3 @@
-const countChars = require('locutus/php/strings/count_chars');
-const strspn = require('locutus/php/strings/strspn');
-const strReplace = require('locutus/php/strings/str_replace');
-
 // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62.php#L38
 const GMP = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62.php#L39
@@ -35,23 +31,36 @@ const convert = (source, sourceBase, targetBase) => {
   return result;
 };
 
+const getMaxChars = (encoding) => {
+  switch (encoding) {
+    case 'latin1':
+      return 256;
+    default:
+      return 65536;
+  }
+}
+
 const createEncoder = (opt) => {
   const options = {
+    encoding: 'utf16',
     characters: GMP,
     ...opt,
   };
 
-  const uniques = countChars(options.characters, 3);
-  if (uniques.length !== 62 || options.characters.length !== 62) {
+  if (!['utf16', 'latin1'].includes(options.encoding)) {
+    throw new Error('Only utf16 and latin1 character encodings are supported');
+  }
+
+  if ([...new Set(options.characters)].length !== 62 || options.characters.length !== 62) {
     throw new Error('Character set must contain 62 unique characters');
   }
 
+  const maxChars = getMaxChars(options.encoding);
+
   // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62/BaseEncoder.php#L110
   const validate = (data) => {
-    if (data.length !== strspn(data, options.characters)) {
-      const valid = [...options.characters];
-      const invalid = countChars(strReplace(valid, '', data), 3);
-
+    const invalid = [...data].filter(c => !options.characters.includes(c));
+    if (invalid.length > 0) {
       throw new Error(`Data contains invalid characters ${invalid}`);
     }
   };
@@ -60,12 +69,17 @@ const createEncoder = (opt) => {
     // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62/BaseEncoder.php#L58
     encode: (value) => {
       const data = [...value].map(c => c.charCodeAt(0));
+
+      if (!data.filter(c => c > maxChars)) {
+        throw new Error(`Data provided is not ${options.encoding}`);
+      }
+
       let leadingZeroes = 0;
       while (data && data[0] === 0) {
         leadingZeroes += 1;
         data.shift();
       }
-      let converted = convert(data, 65536, 62);
+      let converted = convert(data, maxChars, 62);
       if (leadingZeroes > 0) {
         converted = [
           ...Array(leadingZeroes).fill(0, 0, leadingZeroes),
@@ -79,7 +93,7 @@ const createEncoder = (opt) => {
     encodeInt: (value) => {
       const data = [value];
 
-      return convert(data, 65536, 62).map(index => options.characters[index]).join('');
+      return convert(data, maxChars, 62).map(index => options.characters[index]).join('');
     },
     // @see https://github.com/tuupola/base62/blob/2.0.0/src/Base62/BaseEncoder.php#L83
     decode: (value) => {
@@ -90,7 +104,7 @@ const createEncoder = (opt) => {
         leadingZeroes += 1;
         data.shift();
       }
-      let converted = convert(data, 62, 65536);
+      let converted = convert(data, 62, maxChars);
       if (leadingZeroes > 0) {
         converted = [
           ...Array(leadingZeroes).fill(0, 0, leadingZeroes),
