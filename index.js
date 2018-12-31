@@ -33,12 +33,14 @@ const convert = (source, sourceBase, targetBase) => {
 
 const getMaxChars = (encoding) => {
   switch (encoding) {
+    case 'ascii':
+      return 128;
     case 'latin1':
       return 256;
     default:
       return 65536;
   }
-}
+};
 
 const createEncoder = (opt) => {
   const options = {
@@ -47,8 +49,8 @@ const createEncoder = (opt) => {
     ...opt,
   };
 
-  if (!['utf16', 'latin1'].includes(options.encoding)) {
-    throw new Error('Only utf16 and latin1 character encodings are supported');
+  if (!['utf16', 'latin1', 'ascii'].includes(options.encoding)) {
+    throw new Error('Only utf16, latin1, and ascii character encodings are supported');
   }
 
   if ([...new Set(options.characters)].length !== 62 || options.characters.length !== 62) {
